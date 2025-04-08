@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(LoginRequest request) {
+    public User login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -51,14 +51,20 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Invalid credentials");
         }
 
-        // ✅ Return a real token instead of "Login successful"
-        return jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        return user; // return full user instead of token
     }
+
     @Override
     public User updateUserInfo(User user, UserUpdateRequest request) {
         UserUpdateStrategy strategy = userUpdateStrategyFactory.getStrategy(user.getRole());
         User updatedUser = strategy.update(user, request);
         return userRepository.save(updatedUser);
     }
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
 
 }

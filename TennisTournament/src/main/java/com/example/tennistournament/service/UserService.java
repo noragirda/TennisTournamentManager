@@ -8,7 +8,9 @@ import com.example.tennistournament.model.User;
 
 public interface UserService {
     UserResponse register(UserRegisterRequest request);
-    String login(LoginRequest request);
+    User login(LoginRequest request);
     User updateUserInfo(User user, UserUpdateRequest request);
+    User getUserByEmail(String email);
+
 
 }

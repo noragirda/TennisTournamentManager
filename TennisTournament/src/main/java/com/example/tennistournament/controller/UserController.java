@@ -43,6 +43,7 @@ public class UserController
                 updatedUser.getName(),
                 updatedUser.getEmail(),
                 updatedUser.getRole().name()
+
         ));
     }
 

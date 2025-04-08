@@ -31,16 +31,20 @@ public class RefereeServiceImpl implements RefereeService {
 
         return matches.stream().map(match -> RefereeMatchResponse.builder()
                 .matchId(match.getId())
-                .player1(match.getPlayer1().getName())
-                .player2(match.getPlayer2().getName())
+                .player1Name(match.getPlayer1().getName())
+                .player1Id(match.getPlayer1().getId())
+                .player2Name(match.getPlayer2().getName())
+                .player2Id(match.getPlayer2().getId())
                 .matchDateTime(match.getMatchDatetime())
                 .round(match.getRound().name())
                 .location(match.getCourtName())
                 .status(match.getStatus().name())
+                .tournamentName(match.getTournament().getName())
                 .build()).toList();
+
     }
 
-    @Override
+   /* @Override
     public void updateMatchScore(Long matchId, ScoreUpdateRequest request, Long refereeId) {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new RuntimeException("Match not found"));
@@ -76,5 +80,58 @@ public class RefereeServiceImpl implements RefereeService {
         match.setStatus(MatchStatus.COMPLETED);
         scoreRepository.save(score);
         matchRepository.save(match);
+    }*/
+   @Override
+   public void updateMatchScore(Long matchId, ScoreUpdateRequest request, Long refereeId) {
+       Match match = matchRepository.findById(matchId)
+               .orElseThrow(() -> new RuntimeException("Match not found"));
+
+       if (!match.getReferee().getId().equals(refereeId)) {
+           throw new RuntimeException("You are not the assigned referee for this match");
+       }
+
+       if (match.getStatus() == MatchStatus.COMPLETED) {
+           throw new RuntimeException("Match score has already been recorded");
+       }
+
+       // Validate winner only if it's being set
+       if (request.getWinnerId() != null &&
+               !request.getWinnerId().equals(match.getPlayer1().getId()) &&
+               !request.getWinnerId().equals(match.getPlayer2().getId())) {
+           throw new RuntimeException("Winner must be one of the players");
+       }
+
+       // Build Score entity
+       Score score = match.getScore(); // ⬅️ fetch the existing score
+
+       if (score == null) {
+           throw new RuntimeException("No score found for this match");
+       }
+
+// Update fields instead of creating new one
+       score.setPlayer1_points(request.getPlayer1Points());
+       score.setPlayer2_points(request.getPlayer2Points());
+       score.setSets_won_player1(request.getSetsWonPlayer1());
+       score.setSets_won_player2(request.getSetsWonPlayer2());
+       score.setTiebreak_played(request.isTiebreakPlayed());
+       score.setRetirement(request.isRetirement());
+       score.setWalkover(request.isWalkover());
+
+       if (request.getWinnerId() != null) {
+           User winner = userRepository.findById(request.getWinnerId())
+                   .orElseThrow(() -> new RuntimeException("Winner user not found"));
+           score.setWinner_id(winner);
+       }
+
+       match.setStatus(MatchStatus.valueOf(request.getStatus())); // Update match status
+       scoreRepository.save(score);
+       matchRepository.save(match);
+
+   }
+    public Score getScoreByMatchId(Long matchId) {
+        return scoreRepository.findByMatchId(matchId)
+                .orElseThrow(() -> new RuntimeException("Score not found for this match"));
     }
+
+
 }

@@ -1,7 +1,9 @@
 package com.example.tennistournament.controller;
 
+import com.example.tennistournament.dto.AdminTournamentResponse;
 import com.example.tennistournament.dto.AdminUpdateUserRequest;
 import com.example.tennistournament.dto.UserResponse;
+import com.example.tennistournament.model.Tournament;
 import com.example.tennistournament.repository.UserRepository;
 import com.example.tennistournament.service.AdminService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,24 +50,67 @@ public class AdminController
         return ResponseEntity.ok("User deleted successfully");
     }
 
+    @PostMapping("/tournaments")
+    public ResponseEntity<Tournament> createTournament(@RequestBody Tournament tournament) {
+        return ResponseEntity.ok(adminService.createTournament(tournament));
+    }
+    @PostMapping("/tournaments/{id}/generate-matches")
+    public ResponseEntity<String> generateMatches(@PathVariable Long id) {
+        adminService.generateMatches(id);
+        return ResponseEntity.ok("Matches created.");
+    }
+    @DeleteMapping("/tournaments/{id}")
+    public ResponseEntity<String> deleteTournament(@PathVariable Long id) {
+        adminService.deleteTournament(id);
+        return ResponseEntity.ok("Tournament deleted.");
+    }
+
+    @DeleteMapping("/matches/{id}")
+    public ResponseEntity<String> deleteMatch(@PathVariable Long id) {
+        adminService.deleteMatch(id);
+        return ResponseEntity.ok("Match deleted.");
+    }
+    @PutMapping("/tournaments/{id}")
+    public ResponseEntity<Tournament> updateTournament(@PathVariable Long id, @RequestBody Tournament updated) {
+        Tournament result = adminService.updateTournament(id, updated);
+        return ResponseEntity.ok(result);
+    }
+    @GetMapping("/tournaments")
+    public ResponseEntity<List<AdminTournamentResponse>> getAllTournaments() {
+        return ResponseEntity.ok(adminService.getAllTournaments());
+    }
+    @PostMapping("/tournaments/{id}/assign-referees")
+    public ResponseEntity<String> assignRefereesToTournament(
+            @PathVariable Long id,
+            @RequestBody List<Long> refereeIds) {
+        adminService.assignRefereesToTournament(id, refereeIds);
+        return ResponseEntity.ok("Referees assigned successfully.");
+    }
     @GetMapping("/matches/export/csv")
     public void exportMatchesCsv(HttpServletResponse response) throws IOException {
         byte[] data = adminService.exportMatchListAsCsv();
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=matches.csv");
-        OutputStream outputStream = response.getOutputStream();
-        outputStream.write(data);
-        outputStream.flush();
+        response.getOutputStream().write(data);
+        response.getOutputStream().flush();
     }
+
 
     @GetMapping("/matches/export/txt")
     public void exportMatchesTxt(HttpServletResponse response) throws IOException {
         byte[] data = adminService.exportMatchListAsTxt();
         response.setContentType("text/plain");
         response.setHeader("Content-Disposition", "attachment; filename=matches.txt");
-        OutputStream outputStream = response.getOutputStream();
-        outputStream.write(data);
-        outputStream.flush();
+        response.getOutputStream().write(data);
+        response.getOutputStream().flush();
     }
+
+
+
+
+
+
+
+
 
 }

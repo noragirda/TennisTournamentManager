@@ -1,6 +1,7 @@
 package com.example.tennistournament.model;
 import com.example.tennistournament.model.enums.MatchRound;
 import com.example.tennistournament.model.enums.MatchStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class Match {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id")
+    @JsonIgnore
     private Tournament tournament;
 
     @ManyToOne
@@ -53,6 +55,7 @@ public class Match {
     private Integer durationMinutes;
 
     @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Score score;
 
 

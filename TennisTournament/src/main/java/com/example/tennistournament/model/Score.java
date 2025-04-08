@@ -32,6 +32,13 @@ public class Score {
     private boolean tiebreak_played;
     private boolean retirement;
     private boolean walkover;
+    @Column(length = 10)
+    private String set1Score;
+    @Column(length = 10)
+    private String set2Score;
+    @Column(length = 10)
+    private String set3Score;
+
 
     public String getScoreValue() {
         if (retirement) return "Retired";

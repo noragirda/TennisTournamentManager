@@ -9,10 +9,13 @@ import java.time.LocalDateTime;
 @Builder
 public class RefereeMatchResponse {
     private Long matchId;
-    private String player1;
-    private String player2;
+    private String player1Name;
+    private Long player1Id;
+    private String player2Name;
+    private Long player2Id;
     private LocalDateTime matchDateTime;
     private String round;
     private String location;
     private String status;
+    private String tournamentName;
 }

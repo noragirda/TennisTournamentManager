@@ -45,7 +45,7 @@ public class PlayerTournamentServiceImpl implements PlayerTournamentService
         Registration registration = Registration.builder()
                 .player(player)
                 .tournament(tournament)
-                .status(RegistrationStatus.CONFIRMED)
+                .status(RegistrationStatus.APPROVED)
                 .registrationDate(LocalDate.now())
                 .build();
 
@@ -71,4 +71,15 @@ public class PlayerTournamentServiceImpl implements PlayerTournamentService
                 .filter(score -> score != null)
                 .toList();
     }
+    @Override
+    public List<Match> getPlayerMatches(User player) {
+        return matchRepository.findByPlayer1OrPlayer2(player, player);
+    }
+
+    @Override
+    public Match getMatchById(Long matchId) {
+        return matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+    }
+
 }

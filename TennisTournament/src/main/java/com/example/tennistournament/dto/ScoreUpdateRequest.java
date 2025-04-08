@@ -12,4 +12,10 @@ public class ScoreUpdateRequest {
     private boolean tiebreakPlayed;
     private boolean retirement;
     private boolean walkover;
+    private String set1;
+    private String set2;
+    private String set3;
+    private String status;
+
+
 }
